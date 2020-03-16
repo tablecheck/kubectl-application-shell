@@ -26,28 +26,33 @@ fi
 
 if [[ "$2" == "" ]]
 then
-    echo "Missing image."
-    exit 1
+    echo "Missing image. Using currently deployed image from the deployment name."
+else
+    deploymentname=$2
 fi
 
 if [[ "$3" == "" ]]
 then
-    echo "Missing config map."
-    exit 1
+    echo "Missing config map. Using currently deployed config-map from the deployment name."
+else
+    configmapname=$3
 fi
+
+deploymentname=`kubectl get deployment $1 -o=jsonpath='{$.spec.template.spec.containers[:1].image}'`
+configmapname=`kubectl get deployment $1 -o=jsonpath='{$.spec.template.spec.containers[:1].envFrom[0].configMapRef.name}'`
 
 kubectl run -it --rm $1 --image=$2 --restart=Never --overrides='
 {
   "spec": {
     "containers": [
       {
-        "name": "$1",
-        "image": "$2",
+        "name": $1,
+        "image": $deploymentname,
         "args": ["/bin/bash"],
         "envFrom": [
           {
             "configMapRef": {
-              "name": "$3"
+              "name": $configmapname
             }
           }
         ],
