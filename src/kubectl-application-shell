@@ -11,6 +11,7 @@ while [ -n "$1" ]; do # while loop starts
   --name) name=$2 && echo "name = $name" ;;
 	--image) image=$2 && echo "image = $image" ;;
 	--config) config=$2 && echo "config = $config" ;;
+	--secret) secret=$2 && echo "secret = $secret" ;;
 	--*) echo "Option $1 not recognized" ;;
 
 	esac
@@ -57,20 +58,33 @@ then
     config=`kubectl get deployment --namespace=$namespace $name -o=jsonpath='{$.spec.template.spec.containers[:1].envFrom[0].configMapRef.name}'`
 fi
 
-overrides="
-{
+if [[ "$secret" == "" ]]
+then
+    echo "Missing secret map. Using currently deployed secret-map from the deployment name, if there is one."
+    secret=`kubectl get deployment --namespace=$namespace $name -o=jsonpath='{$.spec.template.spec.containers[:1].envFrom[0].secretRef.name}'`
+fi
+
+overrides_start="{
   \"spec\": {
     \"containers\": [
       {
-        \"name\": $name,
-        \"image\": $image,
+        \"name\": \"$name\",
+        \"image\": \"$image\",
         \"args\": [\"/bin/bash\"],
         \"envFrom\": [
           {
             \"configMapRef\": {
-              \"name\": $config
+              \"name\": \"$config\"
+            }
+          }"
+secretoverride=",
+          {
+            \"secretRef\": {
+              \"name\": \"$secret\"
             }
           }
+"
+overrides_end="
         ],
         \"stdin\": true,
         \"stdinOnce\": true,
@@ -80,4 +94,12 @@ overrides="
   }
 }"
 
-kubectl run -it --rm --namespace=$namespace $name-$RANDOM --image=$image --restart=Never --overrides=$overrides
+if [[ "$secret" == "" ]]
+then
+  overrides=$overrides_start$overrides_end
+else
+  overrides=$overrides_start$secretoverride$overrides_end
+fi
+
+echo running: kubectl run -it --rm --namespace="$namespace" "$name-$RANDOM" --image="$image" --restart=Never --overrides="$overrides"
+kubectl run -it --rm --namespace="$namespace" "$name-$RANDOM" --image="$image" --restart=Never --overrides="$overrides"
