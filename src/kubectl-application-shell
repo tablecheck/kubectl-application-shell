@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# kubectl-application-shell
+# Create a temporary container according to command line flags.
+#
+
+#!/bin/bash
+
+# optional argument handling
+if [[ "$1" == "version" ]]
+then
+    echo "1.0.0"
+    exit 0
+fi
+
+if [[ "$2" == *":"* ]]
+then
+    echo "Missing explicit image tag."
+    exit 1
+fi
+
+if [[ "$2" == "" ]]
+then
+    echo "Missing image."
+    exit 1
+fi
+
+if [[ "$3" == "" ]]
+then
+    echo "Missing config map."
+    exit 1
+fi
+
+kubectl run -it --rm $1 --image=$2 --restart=Never --overrides='
+{
+  "spec": {
+    "containers": [
+      {
+        "name": "$1",
+        "image": "$2",
+        "args": ["/bin/bash"],
+        "envFrom": [
+          {
+            "configMapRef": {
+              "name": "$3"
+            }
+          }
+        ],
+        "stdin": true,
+        "stdinOnce": true,
+        "tty": true
+      }
+    ]
+  }
+}'
