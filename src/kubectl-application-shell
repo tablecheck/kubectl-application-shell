@@ -80,4 +80,4 @@ overrides="
   }
 }"
 
-kubectl run -it --rm --namespace=$namespace $name --image=$image --restart=Never --overrides=$overrides
+kubectl run -it --rm --namespace=$namespace $name-$RANDOM --image=$image --restart=Never --overrides=$overrides
