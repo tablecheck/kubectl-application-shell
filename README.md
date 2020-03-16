@@ -16,9 +16,9 @@ Usage:
 ```
 *  --namespace Deployment Namespace
 *  --name Deployment Name
-	--image Container Image
-	--config Container Config Map name
-	--secret Container Config Secret name
+   --image Container Image
+   --config Container Config Map name
+   --secret Container Config Secret name
 ```
 `*` = Required
 
