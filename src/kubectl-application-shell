@@ -12,7 +12,13 @@ then
     exit 0
 fi
 
-if [[ "$2" == *":"* ]]
+if [[ "$1" == "" ]]
+then
+    echo "Missing name."
+    exit 1
+fi
+
+if [[ ! "$2" =~ ":" ]]
 then
     echo "Missing explicit image tag."
     exit 1
