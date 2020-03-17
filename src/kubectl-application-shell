@@ -25,6 +25,13 @@ then
     exit 0
 fi
 
+# optional argument handling
+if [[ "$1" == "help" ]]
+then
+    echo "example: kubectl application shell --name my-deployment-name --namespace my-namespace"
+    exit 0
+fi
+
 if [[ "$name" == "" ]]
 then
     echo "Missing name."
