@@ -51,6 +51,16 @@ then
     echo "Missing limits. Using the first currently deployed limits from the deployment name."
     cpulimit=$(kubectl get deployment --namespace="$namespace" "$name" -o=jsonpath='{$.spec.template.spec.containers[:1].resources.limits.cpu}')
     memorylimit=$(kubectl get deployment --namespace="$namespace" "$name" -o=jsonpath='{$.spec.template.spec.containers[:1].resources.limits.memory}')
+    if [[ "$cpulimit" == "" ]]
+    then
+        echo "Your deployment does not have a cpu limit in place. Using default cpu limit."
+        cpulimit="none"
+    fi
+    if [[ "$memorylimit" == "" ]]
+    then
+        echo "Your deployment does not have a memory limit in place. Using default memory limit."
+        memorylimit="none"
+    fi
 fi
 
 if [[ "$requests" == "" ]]
@@ -58,6 +68,16 @@ then
     echo "Missing requests. Using the first currently deployed requests from the deployment name."
     cpurequest=$(kubectl get deployment --namespace="$namespace" "$name" -o=jsonpath='{$.spec.template.spec.containers[:1].resources.requests.cpu}')
     memoryrequest=$(kubectl get deployment --namespace="$namespace" "$name" -o=jsonpath='{$.spec.template.spec.containers[:1].resources.requests.memory}')
+    if [[ "$cpurequest" == "" ]]
+    then
+        echo "Your deployment does not have a cpu request in place. Using default cpu request."
+        cpurequest="none"
+    fi
+    if [[ "$memoryrequest" == "" ]]
+    then
+        echo "Your deployment does not have a memory request in place. Using default memory request."
+        memoryrequest="none"
+    fi
 fi
 
 if [[ "$image" == "" ]]
@@ -124,5 +144,22 @@ else
   overrides=$overrides_start$secretoverride$overrides_end
 fi
 
-echo running: kubectl run -it --rm --namespace="$namespace" "$name-$RANDOM" --image="$image" --restart=Never --limits="cpu=$cpulimit,memory=$memorylimit" --requests="cpu=$cpurequest,memory=$memoryrequest" --overrides="$overrides"
-kubectl run -it --rm --namespace="$namespace" "$name-$RANDOM" --image="$image" --restart=Never --limits="cpu=$cpulimit,memory=$memorylimit" --requests="cpu=$cpurequest,memory=$memoryrequest" --overrides="$overrides"
+if [[ "$memorylimit" == "none" ]]
+then
+    requests="cpu=$cpulimit"
+elif [[ "$memoryrequest" == "none" ]]
+then
+    requests="cpu=$cpurequest"
+elif [[ "$cpulimit" == "none" ]]
+then
+    limits="memory=$memorylimit"
+elif [[ "$cpurequest" == "none" ]]
+then
+    limits="memory=$memoryrequests"
+else
+    limits="cpu=$cpulimit,memory=$memorylimit"
+    requests="cpu=$cpurequest,memory=$memoryrequest"
+fi
+
+echo running: kubectl run -it --rm --namespace="$namespace" "$name-$RANDOM" --image="$image" --restart=Never --limits="$limits" --requests="$requests" --overrides="$overrides"
+kubectl run -it --rm --namespace="$namespace" "$name-$RANDOM" --image="$image" --restart=Never --limits="$limits" --requests="$requests" --overrides="$overrides"
