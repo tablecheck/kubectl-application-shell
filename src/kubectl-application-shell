@@ -47,7 +47,7 @@ fi
 if [[ "$image" == "" ]]
 then
     echo "Missing image. Using currently deployed image from the deployment name."
-    image=`kubectl get deployment --namespace=$namespace $name -o=jsonpath='{$.spec.template.spec.containers[:1].image}'`
+    image=$(kubectl get deployment --namespace=$namespace $name -o=jsonpath='{$.spec.template.spec.containers[:1].image}')
 fi
 
 if [[ ! "$image" =~ ":" ]]
@@ -62,13 +62,13 @@ fi
 if [[ "$config" == "" ]]
 then
     echo "Missing config map. Using currently deployed config-map from the deployment name."
-    config=`kubectl get deployment --namespace=$namespace $name -o=jsonpath='{$.spec.template.spec.containers[:1].envFrom[0].configMapRef.name}'`
+    config=$(kubectl get deployment --namespace=$namespace $name -o=jsonpath='{$.spec.template.spec.containers[:1].envFrom[0].configMapRef.name}')
 fi
 
 if [[ "$secret" == "" ]]
 then
     echo "Missing secret map. Using currently deployed secret-map from the deployment name, if there is one."
-    secret=`kubectl get deployment --namespace=$namespace $name -o=jsonpath='{$.spec.template.spec.containers[:1].envFrom[0].secretRef.name}'`
+    secret=$(kubectl get deployment --namespace=$namespace $name -o=jsonpath='{$.spec.template.spec.containers[:1].envFrom[0].secretRef.name}')
 fi
 
 overrides_start="{
