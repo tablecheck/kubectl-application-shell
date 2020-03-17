@@ -147,7 +147,7 @@ fi
 if [[ ! "$limits" == "" ]]
 then
     limits=$limits
-if [[ ! "$requests" == "" ]]
+elif [[ ! "$requests" == "" ]]
 then
     requests=$requests
 elif [[ "$memorylimit" == "none" ]]
