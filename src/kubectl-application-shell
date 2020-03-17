@@ -125,4 +125,4 @@ else
 fi
 
 echo running: kubectl run -it --rm --namespace="$namespace" "$name-$RANDOM" --image="$image" --restart=Never --limits=$limits --requests=$requests --overrides="$overrides"
-kubectl run -it --rm --namespace="$namespace" "$name-$RANDOM" --image="$image" --restart=Never --limits="cpu=$cpulimits,memory=$memorylimits" --requests="cpu=$cpurequests,memory=$memoryrequests" --overrides="$overrides"
+kubectl run -it --rm --namespace="$namespace" "$name-$RANDOM" --image="$image" --restart=Never --limits="cpu=$cpulimit,memory=$memorylimit" --requests="cpu=$cpurequest,memory=$memoryrequest" --overrides="$overrides"
