@@ -8,7 +8,7 @@
 while [ -n "$1" ]; do # while loop starts
 	case "$1" in
 	--namespace) namespace=$2 && echo "namespace = $namespace" ;;
-  --name) name=$2 && echo "name = $name" ;;
+        --name) name=$2 && echo "name = $name" ;;
 	--image) image=$2 && echo "image = $image" ;;
 	--config) config=$2 && echo "config = $config" ;;
 	--secret) secret=$2 && echo "secret = $secret" ;;
