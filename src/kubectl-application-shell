@@ -155,7 +155,7 @@ then
     limits="memory=$memorylimit"
 elif [[ "$cpurequest" == "none" ]]
 then
-    limits="memory=$memoryrequests"
+    limits="memory=$memoryrequest"
 else
     limits="cpu=$cpulimit,memory=$memorylimit"
     requests="cpu=$cpurequest,memory=$memoryrequest"
