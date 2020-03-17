@@ -11,7 +11,8 @@ This command essentially wraps around `kubectl run`. It will allow you to specif
 
 ### Installation
 
-To install it, add `src/kubectl-application-shell` to your PATH.
+To install it as a kubectl plugin, add `src/kubectl-application-shell` to your PATH.
+To install it as a wrapper, add `kubeas` to your PATH. You can install a fish completion script in completions by using `completions/fish_install.sh`.
 
 ### Usage
 
