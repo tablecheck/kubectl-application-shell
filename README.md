@@ -1,16 +1,21 @@
 # kubectl-application-shell
 
+
+### Description
+
 This kubectl plugin allows you to solve this issue:
 
-> The applications tend to be monolithic and require the entire codebase to be baked into the image. The codebase contains methods and scripts related to the application usually for interacting with persistent storage (database, elasticsearch, etc.). The code itself relies on environment variables that it uses as parameters to connect to the persistent storage.
+> You may want to run a one off sql query wrapped up in a script just to glean some information from the database. The traditional way to do this is by using `kubectl exec` into an existing pod running as part of your deployment. However, this may cause issues if your one-off command ends up killing the pod, which may impact production (dropping connections etc). It's much safer just to spin up a pod to do the one off task.
 
-> For example someone many want to run a one off sql query wrapped up in a script just to glean some information from the database. run is perfect for this since we don't want to disrupt existing workers and prefer to spin up a one off pod to do this query which outputs to the users terminal. Pairing this with --env-from makes it easy just to hook into the configmap and secretsmaps which already contain the variables necessary to make the connection to the persistent storage.
+This command essentially wraps around `kubectl run`. It will allow you to specify a deployment name and the deployment namespace, and it will automatically grab the currently running image, config and secret mappings so that you have the required environment variables to complete your one-off task without impacting the existing deployment.
 
-> We could simply exec into a pod that's part of a deployment and has all the environment variables already after orphaning it but we also don't want to endanger any work that pod is currently doing. Part of the problem is the nature of the work itself. It's much safer just to spin up a pod to do the one off task.
+### Installation
 
 To install it, add `src/kubectl-application-shell` to your PATH.
 
-Usage:
+### Usage
+
+Example: `kubectl application shell --name my-deployment-name --namespace my-namespace`
 
 ```
 *  --namespace Deployment Namespace
