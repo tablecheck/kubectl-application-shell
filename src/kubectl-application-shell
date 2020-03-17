@@ -157,6 +157,7 @@ elif [[ "$cpurequest" == "none" ]] && [[ "$requests" == "" ]]
 then
     limits="memory=$memoryrequest"
 elif [[ ! "$cpulimit" == "none" ]] && [[ ! "$cpurequest" == "none" ]] && [[ ! "$memoryrequest" == "none" ]] && [[ ! "$memorylimit" == "none" ]] && [[ "$limits" == "" ]] && [[ "$requests" == "" ]]
+then
     limits="cpu=$cpulimit,memory=$memorylimit"
     requests="cpu=$cpurequest,memory=$memoryrequest"
 fi
