@@ -1,3 +1,4 @@
+# shellcheck disable=SC1071
 #!/bin/zsh
 
 git clone https://github.com/tablecheck/kubectl-application-shell.git ~/.kubeas
