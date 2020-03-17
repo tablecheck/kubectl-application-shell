@@ -56,8 +56,8 @@ fi
 if [[ "$requests" == "" ]]
 then
     echo "Missing requests. Using the first currently deployed requests from the deployment name."
-    cpurequests=$(kubectl get deployment --namespace="$namespace" "$name" -o=jsonpath='{$.spec.template.spec.containers[:1].resources.requests.cpu}')
-    memoryrequests=$(kubectl get deployment --namespace="$namespace" "$name" -o=jsonpath='{$.spec.template.spec.containers[:1].resources.requests.memory}')
+    cpurequest=$(kubectl get deployment --namespace="$namespace" "$name" -o=jsonpath='{$.spec.template.spec.containers[:1].resources.requests.cpu}')
+    memoryrequest=$(kubectl get deployment --namespace="$namespace" "$name" -o=jsonpath='{$.spec.template.spec.containers[:1].resources.requests.memory}')
 fi
 
 if [[ "$image" == "" ]]
@@ -124,5 +124,5 @@ else
   overrides=$overrides_start$secretoverride$overrides_end
 fi
 
-echo running: kubectl run -it --rm --namespace="$namespace" "$name-$RANDOM" --image="$image" --restart=Never --limits=$limits --requests=$requests --overrides="$overrides"
+echo running: kubectl run -it --rm --namespace="$namespace" "$name-$RANDOM" --image="$image" --restart=Never --limits="cpu=$cpulimit,memory=$memorylimit" --requests="cpu=$cpurequest,memory=$memoryrequest" --overrides="$overrides"
 kubectl run -it --rm --namespace="$namespace" "$name-$RANDOM" --image="$image" --restart=Never --limits="cpu=$cpulimit,memory=$memorylimit" --requests="cpu=$cpurequest,memory=$memoryrequest" --overrides="$overrides"
