@@ -23,6 +23,8 @@ Example: `kubectl application shell --name my-deployment-name --namespace my-nam
    --image Container Image
    --config Container Config Map name
    --secret Container Config Secret name
+   --limits Container Resource Limits.  For example, 'cpu=200m,memory=512Mi'.
+   --requests Container Resource Requests.  For example, 'cpu=200m,memory=512Mi'.
 ```
 `*` = Required
 
