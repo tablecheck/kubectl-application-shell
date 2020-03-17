@@ -71,7 +71,7 @@ then
     if [[ "$cpurequest" == "" ]]
     then
         echo "Your deployment does not have a cpu request in place. Using default cpu request."
-        cpurequest="none"
+        cpurequests="none"
     fi
     if [[ "$memoryrequest" == "" ]]
     then
@@ -144,27 +144,32 @@ else
   overrides=$overrides_start$secretoverride$overrides_end
 fi
 
-if [[ ! "$limits" == "" ]]
+if [[ "$memorylimit" == "none" ]]
 then
-    limits=$limits
-elif [[ ! "$requests" == "" ]]
-then
-    requests=$requests
-elif [[ "$memorylimit" == "none" ]]
-then
-    requests="cpu=$cpulimit"
+    arequests="cpu=$cpulimit"
 elif [[ "$memoryrequest" == "none" ]]
 then
-    requests="cpu=$cpurequest"
+    arequests="cpu=$cpurequest"
 elif [[ "$cpulimit" == "none" ]]
 then
-    limits="memory=$memorylimit"
+    alimits="memory=$memorylimit"
 elif [[ "$cpurequest" == "none" ]]
 then
-    limits="memory=$memoryrequest"
+    alimits="memory=$memoryrequest"
+fi
+
+if [[ ! "$limits" == "" ]]
+then
+    limits="$limits"
 else
-    limits="cpu=$cpulimit,memory=$memorylimit"
-    requests="cpu=$cpurequest,memory=$memoryrequest"
+    limits="$alimits"
+fi
+
+if [[ ! "$requests" == "" ]]
+then
+    requests="$requests"
+else
+    requests="$arequests"
 fi
 
 echo running: kubectl run -it --rm --namespace="$namespace" "$name-$RANDOM" --image="$image" --restart=Never --limits="$limits" --requests="$requests" --overrides="$overrides"
