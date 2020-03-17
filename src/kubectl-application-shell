@@ -144,7 +144,13 @@ else
   overrides=$overrides_start$secretoverride$overrides_end
 fi
 
-if [[ "$memorylimit" == "none" ]]
+if [[ ! "$limits" == "" ]]
+then
+    limits=$limits
+if [[ ! "$requests" == "" ]]
+then
+    requests=$requests
+elif [[ "$memorylimit" == "none" ]]
 then
     requests="cpu=$cpulimit"
 elif [[ "$memoryrequest" == "none" ]]
