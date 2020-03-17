@@ -6,18 +6,18 @@
 #!/bin/bash
 
 while [ -n "$1" ]; do # while loop starts
-	case "$1" in
-	--namespace) namespace=$2 && echo "namespace = $namespace" ;;
-        --name) name=$2 && echo "name = $name" ;;
-	--image) image=$2 && echo "image = $image" ;;
-	--config) config=$2 && echo "config = $config" ;;
-	--secret) secret=$2 && echo "secret = $secret" ;;
-        --limits) limits=$2 && echo "limits = $limits" ;;
-        --requests) requests=$2 && echo "requests = $requests" ;;
-	--*) echo "Option $1 not recognized" ;;
+    case "$1" in
+    --namespace) namespace=$2 && echo "namespace = $namespace" ;;
+    --name) name=$2 && echo "name = $name" ;;
+    --image) image=$2 && echo "image = $image" ;;
+    --config) config=$2 && echo "config = $config" ;;
+    --secret) secret=$2 && echo "secret = $secret" ;;
+    --limits) limits=$2 && echo "limits = $limits" ;;
+    --requests) requests=$2 && echo "requests = $requests" ;;
+    --*) echo "Option $1 not recognized" ;;
 
-	esac
-	shift
+    esac
+    shift
 done
 
 # optional argument handling
@@ -71,7 +71,7 @@ then
     if [[ "$cpurequest" == "" ]]
     then
         echo "Your deployment does not have a cpu request in place. Using default cpu request."
-        cpurequests="none"
+        cpurequest="none"
     fi
     if [[ "$memoryrequest" == "" ]]
     then
@@ -144,32 +144,27 @@ else
   overrides=$overrides_start$secretoverride$overrides_end
 fi
 
-if [[ "$memorylimit" == "none" ]]
-then
-    arequests="cpu=$cpulimit"
-elif [[ "$memoryrequest" == "none" ]]
-then
-    arequests="cpu=$cpurequest"
-elif [[ "$cpulimit" == "none" ]]
-then
-    alimits="memory=$memorylimit"
-elif [[ "$cpurequest" == "none" ]]
-then
-    alimits="memory=$memoryrequest"
-fi
-
 if [[ ! "$limits" == "" ]]
 then
-    limits="$limits"
-else
-    limits="$alimits"
-fi
-
+    limits=$limits
 if [[ ! "$requests" == "" ]]
 then
-    requests="$requests"
+    requests=$requests
+elif [[ "$memorylimit" == "none" ]]
+then
+    requests="cpu=$cpulimit"
+elif [[ "$memoryrequest" == "none" ]]
+then
+    requests="cpu=$cpurequest"
+elif [[ "$cpulimit" == "none" ]]
+then
+    limits="memory=$memorylimit"
+elif [[ "$cpurequest" == "none" ]]
+then
+    limits="memory=$memoryrequest"
 else
-    requests="$arequests"
+    limits="cpu=$cpulimit,memory=$memorylimit"
+    requests="cpu=$cpurequest,memory=$memoryrequest"
 fi
 
 echo running: kubectl run -it --rm --namespace="$namespace" "$name-$RANDOM" --image="$image" --restart=Never --limits="$limits" --requests="$requests" --overrides="$overrides"
