@@ -55,9 +55,9 @@ fi
 
 if [[ "$requests" == "" ]]
 then
-    echo "Missing requests. Using the first currently deployed requests from the deployment name.""
-    cpurequests=$(kubectl get deployment --namespace="$namespace" "$name" -o=jsonpath='{$.spec.template.spec.containers[:1].resources.limits.cpu}')
-    memoryrequests=$(kubectl get deployment --namespace="$namespace" "$name" -o=jsonpath='{$.spec.template.spec.containers[:1].resources.limits.memory}')
+    echo "Missing requests. Using the first currently deployed requests from the deployment name."
+    cpurequests=$(kubectl get deployment --namespace="$namespace" "$name" -o=jsonpath='{$.spec.template.spec.containers[:1].resources.requests.cpu}')
+    memoryrequests=$(kubectl get deployment --namespace="$namespace" "$name" -o=jsonpath='{$.spec.template.spec.containers[:1].resources.requests.memory}')
 fi
 
 if [[ "$image" == "" ]]
