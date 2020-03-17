@@ -12,6 +12,8 @@ while [ -n "$1" ]; do # while loop starts
 	--image) image=$2 && echo "image = $image" ;;
 	--config) config=$2 && echo "config = $config" ;;
 	--secret) secret=$2 && echo "secret = $secret" ;;
+        --limits) limits=$2 && echo "limits = $limits" ;;
+        --requests) requests=$2 && echo "requests = $requests" ;;
 	--*) echo "Option $1 not recognized" ;;
 
 	esac
@@ -44,9 +46,23 @@ then
     exit 1
 fi
 
+if [[ "$limits" == "" ]]
+then
+    echo "Missing limits. Using the first currently deployed limits from the deployment name."
+    cpulimit=$(kubectl get deployment --namespace="$namespace" "$name" -o=jsonpath='{$.spec.template.spec.containers[:1].resources.limits.cpu}')
+    memorylimit=$(kubectl get deployment --namespace="$namespace" "$name" -o=jsonpath='{$.spec.template.spec.containers[:1].resources.limits.memory}')
+fi
+
+if [[ "$requests" == "" ]]
+then
+    echo "Missing requests. Using the first currently deployed requests from the deployment name.""
+    cpurequests=$(kubectl get deployment --namespace="$namespace" "$name" -o=jsonpath='{$.spec.template.spec.containers[:1].resources.limits.cpu}')
+    memoryrequests=$(kubectl get deployment --namespace="$namespace" "$name" -o=jsonpath='{$.spec.template.spec.containers[:1].resources.limits.memory}')
+fi
+
 if [[ "$image" == "" ]]
 then
-    echo "Missing image. Using currently deployed image from the deployment name."
+    echo "Missing image. Using the first currently deployed image from the deployment name."
     image=$(kubectl get deployment --namespace="$namespace" "$name" -o=jsonpath='{$.spec.template.spec.containers[:1].image}')
 fi
 
@@ -61,7 +77,7 @@ fi
 
 if [[ "$config" == "" ]]
 then
-    echo "Missing config map. Using currently deployed config-map from the deployment name."
+    echo "Missing config map. Using the first currently deployed config-map from the deployment name."
     config=$(kubectl get deployment --namespace="$namespace" "$name" -o=jsonpath='{$.spec.template.spec.containers[:1].envFrom[0].configMapRef.name}')
 fi
 
@@ -108,5 +124,5 @@ else
   overrides=$overrides_start$secretoverride$overrides_end
 fi
 
-echo running: kubectl run -it --rm --namespace="$namespace" "$name-$RANDOM" --image="$image" --restart=Never --overrides="$overrides"
-kubectl run -it --rm --namespace="$namespace" "$name-$RANDOM" --image="$image" --restart=Never --overrides="$overrides"
+echo running: kubectl run -it --rm --namespace="$namespace" "$name-$RANDOM" --image="$image" --restart=Never --limits=$limits --requests=$requests --overrides="$overrides"
+kubectl run -it --rm --namespace="$namespace" "$name-$RANDOM" --image="$image" --restart=Never --limits="cpu=$cpulimits,memory=$memorylimits" --requests="cpu=$cpurequests,memory=$memoryrequests" --overrides="$overrides"
