@@ -144,21 +144,31 @@ else
   overrides=$overrides_start$secretoverride$overrides_end
 fi
 
-if [[ "$memorylimit" == "none" ]] && [[ "$limits" == "" ]]
+if [[ "$memorylimit" == "none" ]] && [[ "$cpulimit" == "none" ]] && [[ "$limits" == "" ]]
+then
+    limits=""
+elif [[ "$memorylimit" == "none" ]] && [[ ! "$cpulimit" == "none" ]] && [[ "$limits" == "" ]]
 then
     limits="cpu=$cpulimit"
-elif [[ "$memoryrequest" == "none" ]] && [[ "$requests" == "" ]]
-then
-    requests="cpu=$cpurequest"
-elif [[ "$cpulimit" == "none" ]] && [[ "$limits" == "" ]]
+elif [[ ! "$memorylimit" == "none" ]] && [[ "$cpulimit" == "none" ]] && [[ "$limits" == "" ]]
 then
     limits="memory=$memorylimit"
-elif [[ "$cpurequest" == "none" ]] && [[ "$requests" == "" ]]
-then
-    limits="memory=$memoryrequest"
-elif [[ ! "$cpulimit" == "none" ]] && [[ ! "$cpurequest" == "none" ]] && [[ ! "$memoryrequest" == "none" ]] && [[ ! "$memorylimit" == "none" ]] && [[ "$limits" == "" ]] && [[ "$requests" == "" ]]
+elif [[ ! "$memorylimit" == "none" ]] && [[ ! "$cpulimit" == "none" ]] && [[ "$limits" == "" ]]
 then
     limits="cpu=$cpulimit,memory=$memorylimit"
+fi
+
+if [[ "$memoryrequest" == "none" ]] && [[ "$cpurequest" == "none" ]] && [[ "$requests" == "" ]]
+then
+    requests=""
+elif [[ "$memoryrequest" == "none" ]] && [[ ! "$cpurequest" == "none" ]] && [[ "$requests" == "" ]]
+then
+    requests="cpu=$cpurequest"
+elif [[ ! "$memoryrequest" == "none" ]] && [[ "$cpurequest" == "none" ]] && [[ "$requests" == "" ]]
+then
+    requests="memory=$memoryrequest"
+elif [[ ! "$memoryrequest" == "none" ]] && [[ ! "$cpurequest" == "none" ]] && [[ "$requests" == "" ]]
+then
     requests="cpu=$cpurequest,memory=$memoryrequest"
 fi
 
