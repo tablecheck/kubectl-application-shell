@@ -144,25 +144,19 @@ else
   overrides=$overrides_start$secretoverride$overrides_end
 fi
 
-if [[ ! "$limits" == "" ]]
+if [[ "$memorylimit" == "none" ]] && [[ "$limits" == "" ]]
 then
-    limits=$limits
-if [[ ! "$requests" == "" ]]
-then
-    requests=$requests
-elif [[ "$memorylimit" == "none" ]]
-then
-    requests="cpu=$cpulimit"
-elif [[ "$memoryrequest" == "none" ]]
+    limit="cpu=$cpulimit"
+elif [[ "$memoryrequest" == "none" ]] && [[ "$requests" == "" ]]
 then
     requests="cpu=$cpurequest"
-elif [[ "$cpulimit" == "none" ]]
+elif [[ "$cpulimit" == "none" ]] && [[ "$limits" == "" ]]
 then
     limits="memory=$memorylimit"
-elif [[ "$cpurequest" == "none" ]]
+elif [[ "$cpurequest" == "none" ]] && [[ "$requests" == "" ]]
 then
     limits="memory=$memoryrequest"
-else
+elif [[ ! "$cpulimit" == "none" ]] && [[ ! "$cpurequest" == "none" ]] && [[ ! "$memoryrequest" == "none" ]] && [[ ! "$memorylimit" == "none" ]] && [[ "$limits" == "" ]] && [[ "$requests" == "" ]]
     limits="cpu=$cpulimit,memory=$memorylimit"
     requests="cpu=$cpurequest,memory=$memoryrequest"
 fi
