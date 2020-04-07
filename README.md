@@ -1,6 +1,5 @@
 # kubectl-application-shell
 
-
 ### Description
 
 This kubectl plugin allows you to solve this issue:
@@ -9,10 +8,17 @@ This kubectl plugin allows you to solve this issue:
 
 This command essentially wraps around `kubectl run`. It will allow you to specify a deployment name and the deployment namespace, and it will automatically grab the currently running image, resource limits/requests, config and secret mappings so that you have the required environment variables to complete your one-off task without impacting the existing deployment.
 
+### Pre-requisites
+
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+- [jq](https://github.com/stedolan/jq/wiki/Installation)
+
 ### Installation
 
+TODO: automated install method
+
 To install it as a kubectl plugin, add `src/kubectl-application-shell` to your PATH.
-To install it as a wrapper, add `kubeas` to your PATH. You can install a fish completion script in completions by using `completions/fish_install.sh`.
+To install it as a wrapper, add `src/kubectl-application-shell` and name it `kubeas` to your PATH. You can install a fish completion script in completions by using `completions/fish_install.sh`.
 
 ### Usage
 
@@ -20,13 +26,10 @@ Example: `kubectl application shell --name my-deployment-name --namespace my-nam
 
 ```
 *  --namespace Deployment Namespace
-*  --name Deployment Name
-   --image Container Image
-   --config Container Config Map name
-   --secret Container Config Secret name
+*  --deployment Deployment Name
    --limits Container Resource Limits.  For example, 'cpu=200m,memory=512Mi'.
    --requests Container Resource Requests.  For example, 'cpu=200m,memory=512Mi'.
 ```
 `*` = Required
 
-It will automatically grab the image, resource limits/requests, config and secret mappings from the existing deployment name if not specified.
+It will automatically grab the image, resource limits/requests, config and secret mappings from the specified deployment.
