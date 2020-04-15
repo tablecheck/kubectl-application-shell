@@ -132,15 +132,15 @@ then
 fi
 
 kubectl_run_cmd="kubectl run \
-  -it \
-  --rm \
-  --restart=Never \
-  --namespace=\"$namespace\" \
-  --limits=\"$limits\" \
-  --requests=\"$requests\" \
-  --image=\"$image\" \
-  \"debug-$deployment-$RANDOM\" \
-  --overrides='${overrides}'"
+-it \
+--rm \
+--restart=Never \
+--namespace=\"$namespace\" \
+--limits=$limits \
+--requests=$requests \
+--image=$image \
+\"debug-$deployment-$RANDOM\" \
+--overrides='${overrides}'"
 
 echo "Running command: ${kubectl_run_cmd}"
 eval "${kubectl_run_cmd}"
