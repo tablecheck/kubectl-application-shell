@@ -97,7 +97,17 @@ overrides=$(echo "{
         \"env\": ${env},
         \"stdin\": true,
         \"stdinOnce\": true,
-        \"tty\": true
+        \"tty\": true,
+        \"resources\": {
+           \"limits\": {
+             \"cpu\": \"1\",
+             \"memory\": \"4Gi\"
+           },
+           \"requests\": {
+             \"cpu\": \"1\",
+             \"memory\": \"4Gi\"
+           }
+        }
       }
     ]
   }
