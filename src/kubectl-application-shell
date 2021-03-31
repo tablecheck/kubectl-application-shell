@@ -149,6 +149,7 @@ kubectl_run_cmd="kubectl run \
 --limits=$limits \
 --requests=$requests \
 --image=$image \
+--pod-running-timeout=5m \
 \"debug-$deployment-$RANDOM\" \
 --overrides='${overrides}'"
 
