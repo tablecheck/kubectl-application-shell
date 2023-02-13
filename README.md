@@ -20,7 +20,7 @@ To install it as a wrapper, add `src/kubectl-application-shell` and name it `kub
 
 ### Usage
 
-Example: `kubectl application shell --name my-deployment-name --namespace my-namespace`
+Example: `kubectl application shell --deployment my-deployment-name --namespace my-namespace`
 
 ```
 *  --namespace Deployment Namespace
