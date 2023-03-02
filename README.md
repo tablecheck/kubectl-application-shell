@@ -31,3 +31,6 @@ Example: `kubectl application shell --deployment my-deployment-name --namespace 
 `*` = Required
 
 It will automatically grab the image, resource limits/requests, config and secret mappings from the specified deployment.
+
+### Using v2
+You can use the draft version of v2 by cloning this repository, then running pipenv install and pipenv shell. You can then run the script directly with python src/kubectl-application-shell.py.
