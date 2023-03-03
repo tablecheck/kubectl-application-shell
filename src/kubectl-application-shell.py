@@ -76,7 +76,6 @@ def main(namespace: str, deployment: str, size: Optional[str] = typer.Argument(N
         ]
       }
     }).replace('"', '\\"')
-    print(kubectl_overrides)
 
     name_random = ''.join(random.choices(string.ascii_lowercase + string.digits, k=5))
 
