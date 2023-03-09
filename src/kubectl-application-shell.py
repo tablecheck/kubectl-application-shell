@@ -57,7 +57,7 @@ def main(namespace: str, deployment: str, size: Optional[str] = typer.Argument(N
     container_name = json.loads(deployment_info)['spec']['template']['spec']['containers'][0]['name']
     image = json.loads(deployment_info)['spec']['template']['spec']['containers'][0]['image']
     env_from = json.loads(deployment_info)['spec']['template']['spec']['containers'][0]['envFrom']
-    annotations = json.loads(deployment_info)['spec']['template']['metadata']['annotations']
+    annotations = json.loads(deployment_info)['metadata']['annotations']
     kubectl_overrides = json.dumps({
       "metadata": {
         "annotations": annotations,
