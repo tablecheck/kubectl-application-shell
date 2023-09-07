@@ -50,7 +50,7 @@ def main(namespace: str, deployment: str, size: Optional[str] = typer.Argument(N
         open(f'{directory}/kubectl', 'wb').write(response.content)
         os.chmod(f'{directory}/kubectl', 0o755)
 
-    print(f":sun: We're ready to go!")
+    print(f":sun: Kubectl resolved!")
 
     # Add overrides
     deployment_info = subprocess.run(['kubectl', 'get', 'deployment', f"--namespace={namespace}", f"{deployment}", "-o", 'json'], capture_output=True, text=True).stdout
@@ -86,4 +86,3 @@ def main(namespace: str, deployment: str, size: Optional[str] = typer.Argument(N
 
 if __name__ == "__main__":
     typer.run(main)
-
