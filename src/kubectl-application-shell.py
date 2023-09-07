@@ -75,13 +75,13 @@ def main(namespace: str, deployment: str, size: Optional[str] = typer.Argument(N
           }
         ]
       }
-    }).replace('"', '\\"')
+    })
 
     name_random = ''.join(random.choices(string.ascii_lowercase + string.digits, k=5))
 
     # Return the kubectl command for them to run.
     print(f":rocket: We're ready to go! [bold blue]Run this command to start your shell[/bold blue]:")
-    sys.exit(f'.kubebin/{kube_version}/kubectl run -it --rm --restart=Never --namespace={namespace} --image={image} --pod-running-timeout=5m debug-{deployment}-{name_random} --overrides="$(echo \"{kubectl_overrides}\" | jq -c .)" -- /bin/bash')
+    sys.exit(f'.kubebin/{kube_version}/kubectl run -it --rm --restart=Never --namespace={namespace} --image={image} --pod-running-timeout=5m debug-{deployment}-{name_random} --overrides=\'{kubectl_overrides}\' -- /bin/bash')
 
 
 if __name__ == "__main__":
