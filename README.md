@@ -20,14 +20,8 @@ To install it as a wrapper, add `src/kubectl-application-shell` and name it `kub
 
 ### Usage
 
-Example: `kubectl application shell --deployment my-deployment-name --namespace my-namespace`
+Run `pipenv install` and `pipenv shell`.
 
-```
-*  --namespace Deployment Namespace
-*  --deployment Deployment Name
-   --limits Container Resource Limits.  For example, 'cpu=200m,memory=512Mi'.
-   --requests Container Resource Requests.  For example, 'cpu=200m,memory=512Mi'.
-```
-`*` = Required
+You can then run the script directly with python src/kubectl-application-shell.py and it will give you the options.
 
 It will automatically grab the image, resource limits/requests, config and secret mappings from the specified deployment.

@@ -3,6 +3,9 @@
 .vscode
 .idea
 
+# App artifacts
+.kubebin
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
