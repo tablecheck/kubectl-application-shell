@@ -15,8 +15,7 @@ This command essentially wraps around `kubectl run`. It will allow you to specif
 
 ### Installation
 
-To install it as a kubectl plugin, add `src/kubectl-application-shell` to your PATH.
-To install it as a wrapper, add `src/kubectl-application-shell` and name it `kubeas` to your PATH. You can install a fish completion script in completions by using `completions/fish_install.sh`.
+This uses pipenv in order to manage dependencies. You need Python 3.
 
 ### Usage
 
