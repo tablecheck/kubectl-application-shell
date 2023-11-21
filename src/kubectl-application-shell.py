@@ -18,7 +18,8 @@ from kubernetes.client.rest import ApiException
 
 config.load_kube_config()
 
-def main(namespace: str, deployment: str, size: Optional[str] = typer.Argument(None)):
+
+def main(namespace: str, deployment: str, size: Optional[str] = typer.Argument(None), image: Optional[str] = typer.Option(None)):
     print(f"Starting [bold magenta]{deployment}[/bold magenta] in [bold magenta]{namespace}[/bold magenta]!", " [bold red]>[/]")
     print(":hotsprings: Please relax for a moment. We're checking your environment.")
 
@@ -55,7 +56,7 @@ def main(namespace: str, deployment: str, size: Optional[str] = typer.Argument(N
     # Add overrides
     deployment_info = subprocess.run(['kubectl', 'get', 'deployment', f"--namespace={namespace}", f"{deployment}", "-o", 'json'], capture_output=True, text=True).stdout
     container_name = json.loads(deployment_info)['spec']['template']['spec']['containers'][0]['name']
-    image = json.loads(deployment_info)['spec']['template']['spec']['containers'][0]['image']
+    image = image or json.loads(deployment_info)['spec']['template']['spec']['containers'][0]['image']
     env_from = json.loads(deployment_info)['spec']['template']['spec']['containers'][0]['envFrom']
     annotations = json.loads(deployment_info)['metadata']['annotations']
     kubectl_overrides = json.dumps({
