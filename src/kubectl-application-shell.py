@@ -57,7 +57,7 @@ def main(namespace: str, deployment: str, size: Optional[str] = typer.Argument(N
     deployment_info = subprocess.run(['kubectl', 'get', 'deployment', f"--namespace={namespace}", f"{deployment}", "-o", 'json'], capture_output=True, text=True).stdout
     container_name = json.loads(deployment_info)['spec']['template']['spec']['containers'][0]['name']
     image = image or json.loads(deployment_info)['spec']['template']['spec']['containers'][0]['image']
-    env_from = json.loads(deployment_info)['spec']['template']['spec']['containers'][0]['envFrom']
+    env_from = json.loads(deployment_info)['spec']['template']['spec']['containers'][0].get('envFrom', None)
     annotations = json.loads(deployment_info)['metadata']['annotations']
     kubectl_overrides = json.dumps({
       "metadata": {
