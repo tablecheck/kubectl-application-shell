@@ -21,6 +21,6 @@ This uses pipenv in order to manage dependencies. You need Python 3.
 
 Run `pipenv install` and `pipenv shell`.
 
-You can then run the script directly with python src/kubectl-application-shell.py and it will give you the options.
+You can then run `python -m kubectl_application_shell` and it will give you the options.
 
 It will automatically grab the image, resource limits/requests, config and secret mappings from the specified deployment.

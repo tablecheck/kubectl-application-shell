@@ -117,7 +117,3 @@ def main(
         f"--image={image} --pod-running-timeout=5m debug-{deployment}-{name_random} "
         f"--overrides='{kubectl_overrides}' -- /bin/bash"
     )
-
-
-if __name__ == "__main__":
-    typer.run(main)
