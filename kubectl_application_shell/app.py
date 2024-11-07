@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
 
 import json
-import os
 import random
 import string
 import sys
 from typing import Optional
 
-import requests
 import typer
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
 from rich import print
 
-from .func import get_deployment_info
+from .func import get_deployment_info, get_kubectl
 
 config.load_kube_config()
 
@@ -49,24 +47,7 @@ def main(
         print(f"Exception when calling VersionApi->get_code: %{e}\n")
         sys.exit(1)
 
-    # Check if the correct Kubernetes binary exists on this machine.
-    directory = os.path.dirname(".kubebin/" + kube_version + "/kubectl")
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-        print(
-            ":wrench: We're going to download the correct "
-            "[bold purple]kubectl[/bold purple] binary for you."
-        )
-
-        response = requests.get(
-            f"https://dl.k8s.io/release/{kube_version}/bin/darwin/arm64/kubectl",
-            allow_redirects=True,
-            timeout=5,
-        )
-        open(f"{directory}/kubectl", "wb").write(response.content)
-        os.chmod(f"{directory}/kubectl", 0o755)
-
-    print(":sun: Kubectl resolved!")
+    kubectl = get_kubectl(kube_version)
 
     # Add overrides
     try:
@@ -108,7 +89,7 @@ def main(
         ":rocket: We're ready to go! [bold blue]Run this command to start your shell[/bold blue]:"
     )
     sys.exit(
-        f".kubebin/{kube_version}/kubectl run -it --rm --restart=Never --namespace={namespace} "
+        f"{kubectl} run -it --rm --restart=Never --namespace={namespace} "
         f"--image={image} --pod-running-timeout=5m debug-{deployment}-{name_random} "
         f"--overrides='{kubectl_overrides}' -- {shell}"
     )
