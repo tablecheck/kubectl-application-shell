@@ -78,6 +78,7 @@ def main(
     image = image or deployment_info.spec.template.spec.containers[0].image
     env_from = deployment_info.spec.template.spec.containers[0].env_from
     annotations = deployment_info.metadata.annotations
+    del annotations["kubectl.kubernetes.io/last-applied-configuration"]
     kubectl_overrides = json.dumps(
         {
             "metadata": {
