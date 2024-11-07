@@ -23,6 +23,7 @@ def main(
     deployment: str,
     # size: Optional[str] = typer.Argument(None),
     image: Optional[str] = typer.Option(None),
+    shell: Optional[str] = typer.Option('bash'),
 ):
     print(
         f"Starting [bold magenta]{deployment}[/bold magenta] "
@@ -89,7 +90,7 @@ def main(
                     {
                         "name": container_name,
                         "image": image,
-                        "args": ["/bin/bash"],
+                        "command": [shell],
                         "envFrom": env_from,
                         "stdin": True,
                         "stdinOnce": True,
@@ -109,5 +110,5 @@ def main(
     sys.exit(
         f".kubebin/{kube_version}/kubectl run -it --rm --restart=Never --namespace={namespace} "
         f"--image={image} --pod-running-timeout=5m debug-{deployment}-{name_random} "
-        f"--overrides='{kubectl_overrides}' -- /bin/bash"
+        f"--overrides='{kubectl_overrides}' -- {shell}"
     )
