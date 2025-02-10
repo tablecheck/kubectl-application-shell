@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 rich = "*"
-typer = {extras = ["all"], version = "*"}
+typer = "*"
 kubernetes = "*"
 requests = "*"
 
@@ -13,3 +13,6 @@ requests = "*"
 
 [requires]
 python_version = "3.9"
+
+[scripts]
+kubeas = {call = "kubectl_application_shell.cli:app()"}

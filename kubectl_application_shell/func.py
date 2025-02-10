@@ -1,12 +1,15 @@
 """support functions for kubectl-application-shell"""
 
 import os
+import sys
 from pathlib import Path
 
 import requests
 from kubernetes import client
 from kubernetes.client.rest import ApiException
-from rich import print
+from rich.progress import Progress, SpinnerColumn, TextColumn
+
+from .console import console
 
 
 def get_kubectl(version: str) -> Path:
@@ -15,24 +18,39 @@ def get_kubectl(version: str) -> Path:
     directory = Path(".kubebin") / version
     if not directory.exists():
         directory.mkdir(parents=True)
-        print(
+        console.print(
             ":wrench: We're going to download the correct "
             "[bold purple]kubectl[/bold purple] binary for you."
         )
 
         arch = "amd64" if os.uname().machine == "x86_64" else "arm64"
-        kubectl_url = f"https://dl.k8s.io/release/{version}/bin/linux/{arch}/kubectl"
+        kubectl_url = f"https://dl.k8s.io/release/{version}/bin/{sys.platform}/{arch}/kubectl"
         kubectl_path = directory / "kubectl"
-        kubectl_path.write_bytes(
-            requests.get(
-                kubectl_url,
-                allow_redirects=True,
-                timeout=5,
-            ).content
-        )
-        kubectl_path.chmod(0o755)
 
-    print(":sun: Kubectl resolved!")
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            transient=True,
+        ) as progress:
+            task = progress.add_task(
+                ":wheel_of_dharma: Downloading kubectl...", total=None
+            )
+            kubectl_path.write_bytes(
+                requests.get(
+                    kubectl_url,
+                    allow_redirects=True,
+                    timeout=5,
+                    hooks={
+                        "response": lambda r, *args, **kwargs: progress.update(
+                            task,
+                            advance=len(r.content),
+                        ),
+                    },
+                ).content
+            )
+            kubectl_path.chmod(0o755)
+
+    console.print(":sun: Kubectl resolved!")
 
     return directory / "kubectl"
 
