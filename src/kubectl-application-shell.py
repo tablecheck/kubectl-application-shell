@@ -19,7 +19,11 @@ from kubernetes.client.rest import ApiException
 config.load_kube_config()
 
 
-def main(namespace: str, deployment: str, size: Optional[str] = typer.Argument(None), image: Optional[str] = typer.Option(None)):
+def main(namespace: str,
+         deployment: str,
+        #  size: Optional[str] = typer.Argument(None),
+         image: Optional[str] = typer.Option(default=None, help="Override container image."),
+         args: Optional[str] = typer.Option(default=None, help="Override command arguments.")):
     print(f"Starting [bold magenta]{deployment}[/bold magenta] in [bold magenta]{namespace}[/bold magenta]!", " [bold red]>[/]")
     print(":hotsprings: Please relax for a moment. We're checking your environment.")
 
@@ -68,7 +72,7 @@ def main(namespace: str, deployment: str, size: Optional[str] = typer.Argument(N
           {
             "name": container_name,
             "image": image,
-            "args": ["/bin/bash"],
+            "args": args and args.split() or ["/bin/bash"],
             "envFrom": env_from,
             "stdin": True,
             "stdinOnce": True,
@@ -82,7 +86,7 @@ def main(namespace: str, deployment: str, size: Optional[str] = typer.Argument(N
 
     # Return the kubectl command for them to run.
     print(f":rocket: We're ready to go! [bold blue]Run this command to start your shell[/bold blue]:")
-    sys.exit(f'.kubebin/{kube_version}/kubectl run -it --rm --restart=Never --namespace={namespace} --image={image} --pod-running-timeout=5m debug-{deployment}-{name_random} --overrides=\'{kubectl_overrides}\' -- /bin/bash')
+    sys.exit(f'.kubebin/{kube_version}/kubectl run -it --rm --restart=Never --namespace={namespace} --image={image} --pod-running-timeout=5m debug-{deployment}-{name_random} --overrides=\'{kubectl_overrides}\'')
 
 
 if __name__ == "__main__":
