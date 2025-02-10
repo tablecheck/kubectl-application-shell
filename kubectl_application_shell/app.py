@@ -4,7 +4,7 @@ import json
 import os
 import random
 import string
-from typing import Annotated, Optional
+from typing import Annotated, List, Optional
 
 import typer
 import typer.cli
@@ -35,6 +35,10 @@ def main(
         str,
         typer.Option(help="The shell to run in the debug pod."),
     ] = "/bin/bash",
+    args: Annotated[
+        List[str],
+        typer.Option(help="The arguments to pass to the shell."),
+    ] = None,
     run: Annotated[
         bool,
         typer.Option("--run", help="Run the debug pod."),
@@ -86,6 +90,7 @@ def main(
                         "name": container_name,
                         "image": image,
                         "command": [shell],
+                        "args": args if args else [],
                         "envFrom": env_from,
                         "stdin": True,
                         "stdinOnce": True,
