@@ -8,6 +8,7 @@ rich = "*"
 typer = "*"
 kubernetes = "*"
 requests = "*"
+kubectl-application-shell = {file = ".", editable = true}
 
 [dev-packages]
 

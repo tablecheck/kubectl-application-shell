@@ -21,6 +21,6 @@ This uses pipenv in order to manage dependencies. You need Python 3.
 
 Run `pipenv install` and `pipenv shell`.
 
-You can then run `pipenv run kubeas` and it will give you the options.
+You can then run `kubeas` and it will give you the options.
 
 It will automatically grab the image, resource limits/requests, config and secret mappings from the specified deployment.
