@@ -22,6 +22,10 @@ def main(
         str,
         typer.Argument(help="The deployment to debug."),
     ],
+    context: Annotated[
+        Optional[str],
+        typer.Option(help="The kubeconfig context to use.", show_default=False),
+    ] = None,
     image: Annotated[
         Optional[str],
         typer.Option(help="The image to run in the debug pod.", show_default=False),
@@ -50,7 +54,7 @@ def main(
     )
 
     # Check the current cluster version.
-    kube_version = get_kube_version()
+    kube_version = get_kube_version(context)
     if not kube_version:
         raise typer.Exit(code=1)
 
@@ -63,7 +67,7 @@ def main(
     kubectl = get_kubectl(kube_version)
 
     # Add overrides
-    deployment_info = get_deployment_info(namespace, deployment)
+    deployment_info = get_deployment_info(namespace, deployment, context)
     if not deployment_info:
         raise typer.Exit(code=1)
 
@@ -104,6 +108,7 @@ def main(
     cmd = "".join(
         [
             f"{kubectl} run -it --rm --restart=Never --namespace={namespace} ",
+            f"--context={context} " if context else " ",
             f"--image={image} --pod-running-timeout=5m debug-{deployment}-{name_random} ",
             f"--overrides='{kubectl_overrides}' -- {shell}",
         ]

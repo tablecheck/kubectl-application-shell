@@ -14,15 +14,22 @@ from urllib3.exceptions import MaxRetryError
 
 from .console import console
 
+def get_api_client(context: str = None) -> client.ApiClient:
+    """get a kubernetes API client"""
 
-config.load_kube_config()
-api_client = client.ApiClient()
+    try:
+        config.load_kube_config(context=context)
+    except config.config_exception.ConfigException:
+        config.load_incluster_config()
+
+    return client.ApiClient()
 
 
-def get_kube_version() -> Optional[str]:
+def get_kube_version(context: str = None) -> Optional[str]:
     """get the version of the kubernetes cluster"""
 
-    version = None
+    api_client = get_api_client(context)
+
     try:
         version = client.VersionApi(api_client).get_code()
     except (ApiException, MaxRetryError) as e:
@@ -78,10 +85,11 @@ def get_kubectl(version: str) -> Path:
 def get_deployment_info(
     namespace: str,
     deployment: str,
+    context: str = None,
 ) -> Optional[dict]:
     """get deployment info"""
 
-    apps_v1 = client.AppsV1Api(api_client)
+    apps_v1 = client.AppsV1Api(get_api_client(context))
     try:
         deployment_info = apps_v1.read_namespaced_deployment(
             name=deployment, namespace=namespace, _preload_content=False
