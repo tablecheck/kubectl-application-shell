@@ -1,15 +1,35 @@
 """support functions for kubectl-application-shell"""
 
+import json
 import os
 import sys
 from pathlib import Path
+from typing import Optional
 
 import requests
-from kubernetes import client
+from kubernetes import client, config
 from kubernetes.client.rest import ApiException
 from rich.progress import Progress, SpinnerColumn, TextColumn
+from urllib3.exceptions import MaxRetryError
 
 from .console import console
+
+
+config.load_kube_config()
+api_client = client.ApiClient()
+
+
+def get_kube_version() -> Optional[str]:
+    """get the version of the kubernetes cluster"""
+
+    version = None
+    try:
+        version = client.VersionApi(api_client).get_code()
+    except (ApiException, MaxRetryError) as e:
+        console.print(":fire: Unable to get cluster version:", e.reason)
+        return None
+
+    return version.git_version.split("+")[0].split("-")[0]
 
 
 def get_kubectl(version: str) -> Path:
@@ -56,17 +76,18 @@ def get_kubectl(version: str) -> Path:
 
 
 def get_deployment_info(
-    api_client: client.ApiClient,
     namespace: str,
     deployment: str,
-):
+) -> Optional[dict]:
     """get deployment info"""
 
     apps_v1 = client.AppsV1Api(api_client)
     try:
         deployment_info = apps_v1.read_namespaced_deployment(
-            name=deployment, namespace=namespace
+            name=deployment, namespace=namespace, _preload_content=False
         )
-        return deployment_info
-    except ApiException as e:
-        return e
+    except (ApiException, MaxRetryError) as e:
+        console.print(":fire: Unable to get deployment info:", e.reason)
+        return None
+
+    return json.loads(deployment_info.data)

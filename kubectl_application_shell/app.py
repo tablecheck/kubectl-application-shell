@@ -8,14 +8,9 @@ from typing import Annotated, List, Optional
 
 import typer
 import typer.cli
-from kubernetes import client, config
-from kubernetes.client.rest import ApiException
-from urllib3.exceptions import HTTPError
 
 from .console import console
-from .func import get_deployment_info, get_kubectl
-
-config.load_kube_config()
+from .func import get_deployment_info, get_kubectl, get_kube_version
 
 
 def main(
@@ -55,33 +50,32 @@ def main(
     )
 
     # Check the current cluster version.
-    api_client = client.ApiClient()
-
-    try:
-        api_response = client.VersionApi(api_client).get_code()
-        kube_version = api_response.git_version.split("-")[0].rpartition("+")[0]
-        console.print(
-            ":anchor: Your detected [bold purple]cluster version[/bold purple] is",
-            kube_version,
-            "so we've going to adjust the universe to suit this.",
-        )
-
-    except (ApiException, HTTPError) as e:
-        print(f"Exception when calling VersionApi->get_code: %{e}\n")
+    kube_version = get_kube_version()
+    if not kube_version:
         raise typer.Exit(code=1)
+
+    console.print(
+        ":anchor: Your detected [bold purple]cluster version[/bold purple] is",
+        kube_version,
+        "so we've going to adjust the universe to suit this.",
+    )
 
     kubectl = get_kubectl(kube_version)
 
     # Add overrides
-    try:
-        deployment_info = get_deployment_info(api_client, namespace, deployment)
-    except ApiException as e:
-        print(f"Exception when calling AppsV1Api->read_namespaced_deployment: %{e}\n")
+    deployment_info = get_deployment_info(namespace, deployment)
+    if not deployment_info:
         raise typer.Exit(code=1)
 
-    container_name = deployment_info.spec.template.spec.containers[0].name
-    image = image or deployment_info.spec.template.spec.containers[0].image
-    env_from = deployment_info.spec.template.spec.containers[0].env_from
+    container_name = deployment_info["spec"]["template"]["spec"]["containers"][0]["name"]
+    image = image or deployment_info["spec"]["template"]["spec"]["containers"][0]["image"]
+    env = deployment_info["spec"]["template"]["spec"]["containers"][0].get("env", None)
+    env_from = deployment_info["spec"]["template"]["spec"]["containers"][0].get("envFrom", None)
+    resources = deployment_info["spec"]["template"]["spec"]["containers"][0].get("resources", None)
+    volume_mounts = deployment_info["spec"]["template"]["spec"]["containers"][0].get(
+        "volumeMounts", None
+    )
+    volumes = deployment_info["spec"]["template"]["spec"].get("volumes", None)
     kubectl_overrides = json.dumps(
         {
             "spec": {
@@ -91,12 +85,16 @@ def main(
                         "image": image,
                         "command": [shell],
                         "args": args if args else [],
+                        "env": env,
                         "envFrom": env_from,
+                        "resources": resources,
                         "stdin": True,
                         "stdinOnce": True,
                         "tty": True,
+                        "volumeMounts": volume_mounts,
                     }
-                ]
+                ],
+                "volumes": volumes,
             },
         }
     )
