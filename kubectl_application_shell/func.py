@@ -15,7 +15,7 @@ from .console import console
 def get_kubectl(version: str) -> Path:
     """get kubectl binary matching the cluster version and host architecture"""
 
-    directory = Path(".kubebin") / version
+    directory = Path.home() / Path(".cache/kubectl-application-shell") / version
     if not directory.exists():
         directory.mkdir(parents=True)
         console.print(
