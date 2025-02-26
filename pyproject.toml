@@ -1,0 +1,23 @@
+[project]
+name = "kubectl-application-shell"
+version = "3.0.0"
+description = "Tool to start a debug pod in a Kubernetes deployment"
+readme = "README.md"
+authors = [
+    { name = "Alexander Nicholson", email = "me@0xdragon.com" },
+    { name = "Zak B. Elep", email = "zakame@zakame.net" }
+]
+requires-python = ">=3.9"
+dependencies = [
+    "kubernetes>=31.0.0",
+    "typer>=0.13.1",
+    "requests",
+    "rich",
+]
+
+[project.scripts]
+kubeas = "kubectl_application_shell.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
