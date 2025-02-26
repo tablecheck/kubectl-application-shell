@@ -7,7 +7,6 @@ import string
 from typing import Annotated, List, Optional
 
 import typer
-import typer.cli
 
 from .console import console
 from .func import get_deployment_info, get_kubectl, get_kube_version
