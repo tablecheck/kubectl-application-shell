@@ -29,13 +29,13 @@ def main(
         Optional[str],
         typer.Option(help="The image to run in the debug pod.", show_default=False),
     ] = None,
-    shell: Annotated[
+    command: Annotated[
         str,
-        typer.Option(help="The shell to run in the debug pod."),
+        typer.Argument(help="The command/entrypoint/shell to run in the debug pod."),
     ] = "/bin/bash",
     args: Annotated[
         List[str],
-        typer.Option(help="The arguments to pass to the shell."),
+        typer.Argument(help="The arguments to pass to the command/entrypoint/shell."),
     ] = None,
     run: Annotated[
         bool,
@@ -86,7 +86,7 @@ def main(
                     {
                         "name": container_name,
                         "image": image,
-                        "command": [shell],
+                        "command": [command],
                         "args": args if args else [],
                         "env": env,
                         "envFrom": env_from,
@@ -109,7 +109,7 @@ def main(
             f"{kubectl} run -it --rm --restart=Never --namespace={namespace} ",
             f"--context={context} " if context else " ",
             f"--image={image} --pod-running-timeout=5m debug-{deployment}-{name_random} ",
-            f"--overrides='{kubectl_overrides}' -- {shell}",
+            f"--overrides='{kubectl_overrides}'",
         ]
     )
 
