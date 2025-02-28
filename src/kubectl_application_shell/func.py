@@ -4,15 +4,17 @@ import json
 import os
 import sys
 from pathlib import Path
+from shutil import which
 from typing import Optional
 
 import requests
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
-from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 from urllib3.exceptions import MaxRetryError
 
 from .console import console
+
 
 def get_api_client(context: str = None) -> client.ApiClient:
     """get a kubernetes API client"""
@@ -51,31 +53,41 @@ def get_kubectl(version: str) -> Path:
         )
 
         arch = "amd64" if os.uname().machine == "x86_64" else "arm64"
-        kubectl_url = f"https://dl.k8s.io/release/{version}/bin/{sys.platform}/{arch}/kubectl"
+        kubectl_url = (
+            f"https://dl.k8s.io/release/{version}/bin/{sys.platform}/{arch}/kubectl"
+        )
         kubectl_path = directory / "kubectl"
 
         with Progress(
-            SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            SpinnerColumn(),
             transient=True,
         ) as progress:
             task = progress.add_task(
                 ":wheel_of_dharma: Downloading kubectl...", total=None
             )
-            kubectl_path.write_bytes(
-                requests.get(
+            try:
+                response = requests.get(
                     kubectl_url,
                     allow_redirects=True,
                     timeout=5,
-                    hooks={
-                        "response": lambda r, *args, **kwargs: progress.update(
-                            task,
-                            advance=len(r.content),
-                        ),
-                    },
-                ).content
-            )
-            kubectl_path.chmod(0o755)
+                    stream=True,
+                )
+                progress.update(
+                    task,
+                    total=int(response.headers.get("Content-Length", 0)),
+                )
+                for data in response.iter_content(chunk_size=32768):
+                    with kubectl_path.open("ab") as f:
+                        f.write(data)
+                    progress.update(task, advance=len(data))
+                kubectl_path.chmod(0o755)
+            except requests.exceptions.RequestException as e:
+                console.print(":fire: Unable to download kubectl:", e)
+                console.print(":fire: Falling back to kubectl in $PATH.")
+                directory.rmdir()
+                return which("kubectl")
 
     console.print(":sun: Kubectl resolved!")
 
