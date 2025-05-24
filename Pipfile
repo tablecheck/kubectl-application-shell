@@ -16,4 +16,4 @@ kubectl-application-shell = {file = ".", editable = true}
 python_version = "3.9"
 
 [scripts]
-kubeas = {call = "kubectl_application_shell.cli:app()"}
+kubeas = {call = "kubectl_application_shell:run_cli()"}

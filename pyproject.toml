@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [project.scripts]
-kubeas = "kubectl_application_shell.cli:app"
+kubeas = "kubectl_application_shell:run_cli"
 
 [build-system]
 requires = ["hatchling"]
